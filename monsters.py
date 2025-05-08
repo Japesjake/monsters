@@ -50,28 +50,29 @@ class Monster(Object):
         if self.friendly: self.dx=self.x+50
         else: self.dx=self.x-50
     def attack(self,game):
-        if self.friendly:
-            if self.x<=self.dx and self.reversed==False:
-                self.x+=1
-            if self.x==self.dx:
-                self.reversed=True
-            if self.reversed==True:
-                self.x-=1
-            if self.x==self.sx and self.reversed==True:
-                self.attacking=False
-                self.reversed=False
-                game.turn='foe'
-        else:
-            if self.x>=self.dx and self.reversed==False:
-                self.x-=1
-            if self.x==self.dx:
-                self.reversed=True
-            if self.reversed==True:
-                self.x+=1
-            if self.x==self.sx and self.reversed==True:
-                self.attacking=False
-                self.reversed=False
-                game.turn='friend'
+        if self.attacking:
+            if self.friendly:
+                if self.x<=self.dx and self.reversed==False:
+                    self.x+=1
+                if self.x==self.dx:
+                    self.reversed=True
+                if self.reversed==True:
+                    self.x-=1
+                if self.x==self.sx and self.reversed==True:
+                    self.attacking=False
+                    self.reversed=False
+                    game.turn='foe'
+            else:
+                if self.x>=self.dx and self.reversed==False:
+                    self.x-=1
+                if self.x==self.dx:
+                    self.reversed=True
+                if self.reversed==True:
+                    self.x+=1
+                if self.x==self.sx and self.reversed==True:
+                    self.attacking=False
+                    self.reversed=False
+                    game.turn='friend'
 if True:
     game=Game()
     monster=Monster(200,400,50,50,'monster.png')
@@ -86,10 +87,8 @@ while game.running:
     monster.draw()
     monster2.draw()
     atk_button.draw()
-    if monster.attacking and monster.friendly:
-        monster.attack(game)
-    if monster2.attacking and not monster2.friendly:
-        monster2.attack(game)
+    monster.attack(game)
+    monster2.attack(game)
     if atk_button.is_moused() and game.click:
         if game.turn=='friend':
             monster.attacking=True
