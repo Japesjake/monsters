@@ -18,7 +18,6 @@ class Object:
         self.y=y
         self.sx=x
         self.sy=y
-        self.dx=self.sx+50
         self.sizex=sizex
         self.sizey=sizey
         self.img=pg.image.load(name)
@@ -29,6 +28,7 @@ class Game:
     def __init__(self):
         self.running=True
         self.click=False
+        self.turn='friend'
 class Button(Object):
     def __init__(self,x,y,sizex,sizey,name):
         super().__init__(x,y,sizex,sizey,name)
@@ -40,26 +40,42 @@ class Button(Object):
                 return True
         return False
 class Monster(Object):
-    def __init__(self,x,y,sizex,sizey,name,hp=100,atk=10):
+    def __init__(self,x,y,sizex,sizey,name,hp=100,atk=10,friendly=True):
         super().__init__(x,y,sizex,sizey,name)
         self.hp=hp
         self.atk=atk
         self.attacking=False
         self.reversed=False
-    def attack(self):
-        if self.x<=self.dx and self.reversed==False:
-            self.x+=1
-        if self.x==self.dx:
-            self.reversed=True
-        if self.reversed==True:
-            self.x-=1
-        if self.x==self.sx and self.reversed==True:
-            self.attacking=False
-            self.reversed=False
+        self.friendly=friendly
+        if self.friendly: self.dx=self.x+50
+        else: self.dx=self.x-50
+    def attack(self,game):
+        if self.friendly:
+            if self.x<=self.dx and self.reversed==False:
+                self.x+=1
+            if self.x==self.dx:
+                self.reversed=True
+            if self.reversed==True:
+                self.x-=1
+            if self.x==self.sx and self.reversed==True:
+                self.attacking=False
+                self.reversed=False
+                game.turn='foe'
+        else:
+            if self.x>=self.dx and self.reversed==False:
+                self.x-=1
+            if self.x==self.dx:
+                self.reversed=True
+            if self.reversed==True:
+                self.x+=1
+            if self.x==self.sx and self.reversed==True:
+                self.attacking=False
+                self.reversed=False
+                game.turn='friend'
 if True:
     game=Game()
     monster=Monster(200,400,50,50,'monster.png')
-    monster2=Monster(HEIGHT-200,400,50,50,'freddy.png')
+    monster2=Monster(HEIGHT-200,400,50,50,'freddy.png',friendly=False)
     atk_button=Button(400,600,50,50,'sword.png')
 while game.running:
     for event in pg.event.get():
@@ -70,10 +86,15 @@ while game.running:
     monster.draw()
     monster2.draw()
     atk_button.draw()
-    if monster.attacking:
-        monster.attack()
+    if monster.attacking and monster.friendly:
+        monster.attack(game)
+    if monster2.attacking and not monster2.friendly:
+        monster2.attack(game)
     if atk_button.is_moused() and game.click:
-        monster.attacking=True
+        if game.turn=='friend':
+            monster.attacking=True
+    if game.turn=='foe':
+        monster2.attacking=True
     if game.click:
         game.click=False
     pg.display.update()
