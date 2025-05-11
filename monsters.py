@@ -20,8 +20,9 @@ class Object:
         self.sy=y
         self.sizex=sizex
         self.sizey=sizey
-        self.img=pg.image.load(name)
-        self.img=pg.transform.scale(self.img,(sizex,sizey))
+        self.name=name
+        # self.img=pg.image.load(path)
+        # self.img=pg.transform.scale(self.img,(sizex,sizey))
     def draw(self):
         surface.blit(self.img,(self.x,self.y))
 class Game:
@@ -32,6 +33,9 @@ class Game:
 class Button(Object):
     def __init__(self,x,y,sizex,sizey,name):
         super().__init__(x,y,sizex,sizey,name)
+        self.img=pg.image.load(os.path.join('buttons',name))
+        self.img=pg.transform.scale(self.img,(sizex,sizey))
+
     def is_moused(self):
         self.mouse=pg.mouse.get_pos()
         self.mousex,self.mousey=self.mouse
@@ -49,7 +53,10 @@ class Monster(Object):
         self.friendly=friendly
         if self.friendly: self.dx=self.x+50
         else: self.dx=self.x-50
-    def attack(self,game):
+        self.img=pg.image.load(os.path.join('monsters',name))
+        self.img=pg.transform.scale(self.img,(sizex,sizey))
+        # self.hp_bar=Bar()
+    def move(self,game):
         if self.attacking:
             if self.friendly:
                 if self.x<=self.dx and self.reversed==False:
@@ -75,8 +82,8 @@ class Monster(Object):
                     game.turn='friend'
 if True:
     game=Game()
-    monster=Monster(200,400,50,50,'monster.png')
-    monster2=Monster(HEIGHT-200,400,50,50,'freddy.png',friendly=False)
+    friend=Monster(WIDTH-600,HEIGHT-400,100,100,'wang.png')
+    enemy=Monster(WIDTH-200,HEIGHT-400,100,100,'freddy.png',friendly=False)
     atk_button=Button(400,600,50,50,'sword.png')
 while game.running:
     for event in pg.event.get():
@@ -84,16 +91,17 @@ while game.running:
             game.running=False
         if event.type==pg.MOUSEBUTTONDOWN:
             game.click=True
-    monster.draw()
-    monster2.draw()
-    atk_button.draw()
-    monster.attack(game)
-    monster2.attack(game)
+    if True:
+        friend.draw()
+        enemy.draw()
+        atk_button.draw()
+        friend.move(game)
+        enemy.move(game)
     if atk_button.is_moused() and game.click:
         if game.turn=='friend':
-            monster.attacking=True
+            friend.attacking=True
     if game.turn=='foe':
-        monster2.attacking=True
+        enemy.attacking=True
     if game.click:
         game.click=False
     pg.display.update()
