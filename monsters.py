@@ -2,6 +2,7 @@
 ##<a href="https://www.flaticon.com/free-icons/monster" title="monster icons">Monster icons created by Smashicons - Flaticon</a>
 import pygame as pg
 import os
+from monster_list import *
 if True:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,50)
     pg.init()
@@ -10,6 +11,7 @@ if True:
     pg.mixer.music.play(-1)
     WIDTH=800
     HEIGHT=800
+    GREEN=(0,128,0)
     surface=pg.display.set_mode((WIDTH,HEIGHT))
     pg.display.set_caption("Monsters")
 class Object:
@@ -21,21 +23,6 @@ class Object:
         self.sizex=sizex
         self.sizey=sizey
         self.name=name
-        # self.img=pg.image.load(path)
-        # self.img=pg.transform.scale(self.img,(sizex,sizey))
-    def draw(self):
-        surface.blit(self.img,(self.x,self.y))
-class Game:
-    def __init__(self):
-        self.running=True
-        self.click=False
-        self.turn='friend'
-class Button(Object):
-    def __init__(self,x,y,sizex,sizey,name):
-        super().__init__(x,y,sizex,sizey,name)
-        self.img=pg.image.load(os.path.join('buttons',name))
-        self.img=pg.transform.scale(self.img,(sizex,sizey))
-
     def is_moused(self):
         self.mouse=pg.mouse.get_pos()
         self.mousex,self.mousey=self.mouse
@@ -43,6 +30,25 @@ class Button(Object):
             if self.mousex<=self.x+self.sizex and self.mousey<=self.y+self.sizex:
                 return True
         return False
+    def draw(self):
+        surface.blit(self.img,(self.x,self.y))
+class Game:
+    def __init__(self):
+        self.running=True
+        self.click=False
+        self.turn='friend'
+class Bar(Object):
+    def __init__(self,x,y,sizex,sizey,name):
+        super().__init__(x,y,sizex,sizey,name)
+    def draw(self):
+        pg.draw.rect(surface,GREEN,(self.x,self.y,self.sizex,self.xiz))
+        
+        
+class Button(Object):
+    def __init__(self,x,y,sizex,sizey,name):
+        super().__init__(x,y,sizex,sizey,name)
+        self.img=pg.image.load(os.path.join('buttons',name))
+        self.img=pg.transform.scale(self.img,(sizex,sizey))
 class Monster(Object):
     def __init__(self,x,y,sizex,sizey,name,hp=100,atk=10,friendly=True):
         super().__init__(x,y,sizex,sizey,name)
@@ -55,7 +61,7 @@ class Monster(Object):
         else: self.dx=self.x-50
         self.img=pg.image.load(os.path.join('monsters',name))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
-        # self.hp_bar=Bar()
+        self.hp_bar=Bar(self.x,self.y-10,self.sizex,self.sizey-40,'bar')
     def move(self,game):
         if self.attacking:
             if self.friendly:
