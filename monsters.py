@@ -2,7 +2,6 @@
 ##<a href="https://www.flaticon.com/free-icons/monster" title="monster icons">Monster icons created by Smashicons - Flaticon</a>
 import pygame as pg
 import os
-from monster_list import *
 if True:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,50)
     pg.init()
@@ -41,7 +40,7 @@ class Bar(Object):
     def __init__(self,x,y,sizex,sizey,name):
         super().__init__(x,y,sizex,sizey,name)
     def draw(self):
-        pg.draw.rect(surface,GREEN,(self.x,self.y,self.sizex,self.xiz))
+        pg.draw.rect(surface,GREEN,(self.x,self.y,self.sizex,self.sizey))
         
         
 class Button(Object):
@@ -61,7 +60,7 @@ class Monster(Object):
         else: self.dx=self.x-50
         self.img=pg.image.load(os.path.join('monsters',name))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
-        self.hp_bar=Bar(self.x,self.y-10,self.sizex,self.sizey-40,'bar')
+        self.hp_bar=Bar(self.x,self.y+self.sizey,self.sizex,self.sizey-40,'bar')
     def move(self,game):
         if self.attacking:
             if self.friendly:
@@ -88,8 +87,8 @@ class Monster(Object):
                     game.turn='friend'
 if True:
     game=Game()
-    friend=Monster(WIDTH-600,HEIGHT-400,100,100,'wang.png')
-    enemy=Monster(WIDTH-200,HEIGHT-400,100,100,'freddy.png',friendly=False)
+    friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang.png')
+    enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy.png',friendly=False)
     atk_button=Button(400,600,50,50,'sword.png')
 while game.running:
     for event in pg.event.get():
@@ -101,6 +100,7 @@ while game.running:
         friend.draw()
         enemy.draw()
         atk_button.draw()
+        # friend.hp_bar.draw()
         friend.move(game)
         enemy.move(game)
     if atk_button.is_moused() and game.click:
