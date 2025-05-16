@@ -1,5 +1,8 @@
 ##<a href="https://www.flaticon.com/free-icons/attack" title="attack icons">Attack icons created by AbtoCreative - Flaticon</a>
 ##<a href="https://www.flaticon.com/free-icons/monster" title="monster icons">Monster icons created by Smashicons - Flaticon</a>
+##<a href="https://www.flaticon.com/free-icons/xp" title="xp icons">Xp icons created by Freepik - Flaticon</a>
+##<a href="https://www.flaticon.com/free-icons/xp" title="xp icons">Xp icons created by Falcone - Flaticon</a>
+##<a href="https://www.flaticon.com/free-icons/fishing-net" title="fishing net icons">Fishing net icons created by Freepik - Flaticon</a>
 import pygame as pg
 import os
 if True:
@@ -13,8 +16,10 @@ if True:
     GREEN=(0,128,0)
     surface=pg.display.set_mode((WIDTH,HEIGHT))
     pg.display.set_caption("Monsters")
+    font=pg.font.Font('freesansbold.ttf',15)
+
 class Object:
-    def __init__(self,x,y,sizex,sizey,name):
+    def __init__(self,x,y,sizex,sizey,name,text=False,level=1):
         self.x=x
         self.y=y
         self.sx=x
@@ -22,6 +27,8 @@ class Object:
         self.sizex=sizex
         self.sizey=sizey
         self.name=name
+        self.text=text
+        self.level=level
     def is_moused(self):
         self.mouse=pg.mouse.get_pos()
         self.mousex,self.mousey=self.mouse
@@ -30,12 +37,17 @@ class Object:
                 return True
         return False
     def draw(self):
+        if self.text:
+            self.img=font.render(str(self.level),True,GREEN)        
         surface.blit(self.img,(self.x,self.y))
+
+
 class Game:
     def __init__(self):
         self.running=True
         self.click=False
         self.turn='friend'
+        self.victory=False
 class Bar(Object):
     def __init__(self,x,y,sizex,sizey,name):
         super().__init__(x,y,sizex,sizey,name)
@@ -51,8 +63,8 @@ class Monster(Object):
         super().__init__(x,y,sizex,sizey,name)
         self.hp=hp
         self.atk=atk
-        # self.attacking=False
-        self.attacking=True
+        self.attacking=False
+        # self.attacking=True
         self.reversed=False
         self.friendly=friendly
         self.dead=False
@@ -61,6 +73,8 @@ class Monster(Object):
         self.img=pg.image.load(os.path.join('monsters',name+'.png'))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
         self.hp_bar=Bar(self.x,self.y+self.sizey,self.hp/2,self.sizey-40,'bar')
+        self.level=1
+        self.level_counter=Object(self.x,self.y,10,10,'level',text=True,level=self.level)
     def move(self,game):
         if self.attacking:
             if self.friendly:
@@ -90,6 +104,9 @@ if True:
     friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang')
     enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',friendly=False)
     atk_button=Button(400,600,50,50,'sword.png')
+    victory=Button(275,350,300,100,'victory.png')
+    xp=Button(300,375,50,50,'xp.png')
+    net=Button(500,375,50,50,'net.png')
 while game.running:
     for event in pg.event.get():
         if event.type==pg.QUIT:
@@ -98,20 +115,18 @@ while game.running:
             game.click=True
     if True:
         surface.fill((0,0,0))
-        # pg.display.update()
         friend.draw()
-        # pg.display.update()
         enemy.draw()
-        # pg.display.update()
         atk_button.draw()
-        # pg.display.update()
         friend.hp_bar.draw()
-        # pg.display.update()
         enemy.hp_bar.draw()
-        # pg.display.update()
         friend.move(game)
-        # pg.display.update()
         enemy.move(game)
+        if game.victory:
+            victory.draw()
+            xp.draw()
+            net.draw()
+        friend.level_counter.draw()
         pg.display.update()
     if atk_button.is_moused() and game.click:
         if game.turn=='friend':
@@ -121,6 +136,6 @@ while game.running:
     if game.turn=='foe':
         enemy.attacking=True
     if enemy.hp<=0:
-        enemy.dead=True
+        game.victory=True
     if game.click:
         game.click=False
