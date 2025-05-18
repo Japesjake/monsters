@@ -5,15 +5,17 @@
 ##<a href="https://www.flaticon.com/free-icons/fishing-net" title="fishing net icons">Fishing net icons created by Freepik - Flaticon</a>
 import pygame as pg
 import os
+from thresholds import thresholds
 if True:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,50)
     pg.init()
     pg.mixer.init()
     music=pg.mixer.music.load("battle2.wav")
-    pg.mixer.music.play(-1)
+    # pg.mixer.music.play(-1)
     WIDTH=800
     HEIGHT=800
     GREEN=(0,128,0)
+    RED=(255,0,0)
     surface=pg.display.set_mode((WIDTH,HEIGHT))
     pg.display.set_caption("Monsters")
     font=pg.font.Font('freesansbold.ttf',15)
@@ -40,13 +42,14 @@ class Game:
         self.running=True
         self.click=False
         self.turn='friend'
-        self.victory=False
+        self.victory=True###False
+        self.friendly_monsters=list()
 class Text(Object):
     def __init__(self,x,y,sizex,sizey,name,level):
         super().__init__(x,y,sizex,sizey,name)
         self.level=level
     def draw(self):
-        self.img=font.render(str(self.level),True,GREEN)
+        self.img=font.render(str(self.level),True,RED)
         surface.blit(self.img,(self.x,self.y))   
 class Bar(Object):
     def __init__(self,x,y,sizex,sizey,name):
@@ -59,13 +62,15 @@ class Button(Object):
         self.img=pg.image.load(os.path.join('buttons',name))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
 class Monster(Object):
-    def __init__(self,x,y,sizex,sizey,name,hp=100,atk=10,friendly=True):
+    def __init__(self,x,y,sizex,sizey,name,hp=100,atk=10,friendly=True,worth=100):
         super().__init__(x,y,sizex,sizey,name)
         self.hp=hp
         self.atk=atk
         self.attacking=False
         self.reversed=False
         self.friendly=friendly
+        self.xp=0
+        self.worth=worth
         if self.friendly: self.dx=self.x+50
         else: self.dx=self.x-50
         self.img=pg.image.load(os.path.join('monsters',name+'.png'))
@@ -73,6 +78,7 @@ class Monster(Object):
         self.hp_bar=Bar(self.x,self.y+self.sizey,self.hp/2,self.sizey-40,'bar')
         self.level=1
         self.level_counter=Text(self.x,self.y,10,10,'level',self.level)
+        self.position=0
     def move(self,game):
         if self.attacking:
             if self.friendly:
@@ -97,10 +103,11 @@ class Monster(Object):
                     self.attacking=False
                     self.reversed=False
                     game.turn='friend'
+
 if True:
     game=Game()
-    friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang')
-    enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',friendly=False)
+    friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',worth=100)
+    enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',friendly=False,worth=100)
     atk_button=Button(400,600,50,50,'sword.png')
     victory=Button(275,350,300,100,'victory.png')
     xp=Button(300,375,50,50,'xp.png')
@@ -125,6 +132,9 @@ while game.running:
             xp.draw()
             net.draw()
         friend.level_counter.draw()
+        enemy.level_counter.draw()
+        for monster in game.friendly_monsters:
+            monster.draw()###
         pg.display.update()
     if atk_button.is_moused() and game.click:
         if game.turn=='friend':
@@ -135,5 +145,22 @@ while game.running:
         enemy.attacking=True
     if enemy.hp<=0:
         game.victory=True
+    if game.victory and game.click:
+        if xp.is_moused():
+            friend.xp+=enemy.worth
+            for i in range(len(thresholds)):
+                if i!=len(thresholds)-1 and thresholds[i+1]<=friend.xp:
+                    friend.level=i+1
+            friend.level_counter.level=friend.level
+            print(friend.xp)
+        if net.is_moused():
+            game.friendly_monsters.append(enemy)
+            enemy.x=0
+            enemy.y=enemy.position*50
+            enemy.hp_bar.x=enemy.x
+            enemy.hp_bar.y=enemy.y+50
+            enemy.level_counter.x=0
+            enemy.level_counter.y=enemy.y*50
+            enemy.friendly=True
     if game.click:
         game.click=False
