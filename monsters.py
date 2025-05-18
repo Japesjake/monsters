@@ -17,9 +17,8 @@ if True:
     surface=pg.display.set_mode((WIDTH,HEIGHT))
     pg.display.set_caption("Monsters")
     font=pg.font.Font('freesansbold.ttf',15)
-
 class Object:
-    def __init__(self,x,y,sizex,sizey,name,text=False,level=1):
+    def __init__(self,x,y,sizex,sizey,name):
         self.x=x
         self.y=y
         self.sx=x
@@ -27,8 +26,6 @@ class Object:
         self.sizex=sizex
         self.sizey=sizey
         self.name=name
-        self.text=text
-        self.level=level
     def is_moused(self):
         self.mouse=pg.mouse.get_pos()
         self.mousex,self.mousey=self.mouse
@@ -36,18 +33,21 @@ class Object:
             if self.mousex<=self.x+self.sizex and self.mousey<=self.y+self.sizex:
                 return True
         return False
-    def draw(self):
-        if self.text:
-            self.img=font.render(str(self.level),True,GREEN)        
+    def draw(self):     
         surface.blit(self.img,(self.x,self.y))
-
-
 class Game:
     def __init__(self):
         self.running=True
         self.click=False
         self.turn='friend'
         self.victory=False
+class Text(Object):
+    def __init__(self,x,y,sizex,sizey,name,level):
+        super().__init__(x,y,sizex,sizey,name)
+        self.level=level
+    def draw(self):
+        self.img=font.render(str(self.level),True,GREEN)
+        surface.blit(self.img,(self.x,self.y))   
 class Bar(Object):
     def __init__(self,x,y,sizex,sizey,name):
         super().__init__(x,y,sizex,sizey,name)
@@ -64,17 +64,15 @@ class Monster(Object):
         self.hp=hp
         self.atk=atk
         self.attacking=False
-        # self.attacking=True
         self.reversed=False
         self.friendly=friendly
-        self.dead=False
         if self.friendly: self.dx=self.x+50
         else: self.dx=self.x-50
         self.img=pg.image.load(os.path.join('monsters',name+'.png'))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
         self.hp_bar=Bar(self.x,self.y+self.sizey,self.hp/2,self.sizey-40,'bar')
         self.level=1
-        self.level_counter=Object(self.x,self.y,10,10,'level',text=True,level=self.level)
+        self.level_counter=Text(self.x,self.y,10,10,'level',self.level)
     def move(self,game):
         if self.attacking:
             if self.friendly:
