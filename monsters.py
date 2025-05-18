@@ -112,7 +112,7 @@ class Monster(Object):
                     game.turn='friend'
 if True:
     game=Game()
-    friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',False,worth=100)
+    friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100)
     enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',False,worth=100)
     game.friendly_monsters.append(friend)
     atk_button=Button(400,600,50,50,'sword.png')
