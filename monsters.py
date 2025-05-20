@@ -49,6 +49,30 @@ class Game:
         self.turn='friend'
         self.victory=False
         self.friendly_monsters=list()
+    def store(self, monster):
+        monster.hp=enemy.max
+        monster.x=0
+        if monster not in self.friendly_monsters:
+            self.friendly_monsters.append(monster)
+        for i in range(len(game.friendly_monsters)):
+            game.friendly_monsters[i].position=i
+        monster.y=monster.position*80
+        monster.hp_bar.x=monster.x
+        monster.hp_bar.y=monster.y+50
+        monster.hp_bar.sizex=monster.max/2
+        monster.level_counter.x=0
+        monster.level_counter.y=monster.y-15
+        monster.friendly=True
+        monster.dead=False
+    def retrieve(self, monster):
+        friend.x=WIDTH-600
+        friend.y=HEIGHT-400
+        friend.level_counter.x=friend.x+15
+        friend.level_counter.y=friend.y-15
+        friend.hp_bar.x=friend.x
+        friend.hp_bar.y=friend.y+friend.sizey
+        friend.dx=friend.x+50
+        friend.sx=friend.x
 class Text(Object):
     def __init__(self,x,y,sizex,sizey,name,level):
         super().__init__(x,y,sizex,sizey,name)
@@ -132,8 +156,9 @@ while game.running:
         atk_button.draw()
         friend.hp_bar.draw()
         enemy.hp_bar.draw()
-        friend.move(game)
-        enemy.move(game)
+        if friend.attacking or enemy.attacking:############
+            friend.move(game)
+            enemy.move(game)
         if game.victory:
             victory.draw()
             xp.draw()
@@ -155,6 +180,8 @@ while game.running:
     if enemy.hp<=0 and not enemy.dead:
         game.victory=True
         enemy.dead=True
+        friend.attacking=False
+        enemy.attacking=False
     if game.victory and game.click:
         if xp.is_moused():
             friend.xp+=enemy.worth
@@ -166,18 +193,14 @@ while game.running:
             i=random.randint(0,2)
             enemy=Monster(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5])
         if net.is_moused():
-            enemy.hp=enemy.max
-            enemy.x=0
-            enemy.y=enemy.position*50+20
-            enemy.hp_bar.x=enemy.x
-            enemy.hp_bar.y=enemy.y+50
-            enemy.hp_bar.sizex=enemy.max/2
-            enemy.level_counter.x=15
-            enemy.level_counter.y=0
-            game.friendly_monsters.append(enemy)
-            enemy.friendly=True
+            game.store(enemy)
             game.victory=False
             i=random.randint(0,2)
             enemy=Monster(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5])
     if game.click:
-        game.click=False
+        for monster in game.friendly_monsters:
+            if monster.is_moused():
+                game.store(friend)
+                friend=monster
+                game.retrieve(monster)
+    if game.click: game.click=False
