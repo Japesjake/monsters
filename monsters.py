@@ -141,7 +141,9 @@ while game.running:
         friend.level_counter.draw()
         enemy.level_counter.draw()
         for monster in game.friendly_monsters:
-            monster.draw()###
+            monster.draw()
+            monster.hp_bar.draw()
+            monster.level_counter.draw()
         pg.display.update()
     if atk_button.is_moused() and game.click:
         if game.turn=='friend':
@@ -164,13 +166,15 @@ while game.running:
             i=random.randint(0,2)
             enemy=Monster(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5])
         if net.is_moused():
-            game.friendly_monsters.append(enemy)
+            enemy.hp=enemy.max
             enemy.x=0
-            enemy.y=enemy.position*50
+            enemy.y=enemy.position*50+20
             enemy.hp_bar.x=enemy.x
             enemy.hp_bar.y=enemy.y+50
-            enemy.level_counter.x=0
-            enemy.level_counter.y=enemy.y*50
+            enemy.hp_bar.sizex=enemy.max/2
+            enemy.level_counter.x=15
+            enemy.level_counter.y=0
+            game.friendly_monsters.append(enemy)
             enemy.friendly=True
             game.victory=False
             i=random.randint(0,2)
