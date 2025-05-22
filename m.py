@@ -1,6 +1,6 @@
-#width,height,x,y,name,friendly
+#x,y,width,height,name,friendly
 m=[
-    [600,400,50,50,'wang',False],
-    [600,400,50,50,'freddy',False],
-    [600,400,50,50,'george',False],
+    ['wang',False],
+    ['freddy',False],
+    ['george',False],
 ]

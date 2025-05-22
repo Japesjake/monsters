@@ -10,6 +10,7 @@ if True:
     import os, random
     from thresholds import thresholds
     from m import m
+    from l import l
 if True:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,50)
     pg.init()
@@ -92,7 +93,7 @@ class Button(Object):
         self.img=pg.image.load(os.path.join('buttons',name))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
 class Monster(Object):
-    def __init__(self,x,y,sizex,sizey,name,friendly,hp=100,atk=50,worth=100):
+    def __init__(self,x,y,sizex,sizey,name,friendly,hp=100,atk=10,worth=100):
         super().__init__(x,y,sizex,sizey,name)
         self.hp=hp
         self.max=hp
@@ -136,6 +137,12 @@ class Monster(Object):
                     self.attacking=False
                     self.reversed=False
                     game.turn='friend'
+    def update_stats(self):
+        for level in l:
+            if friend.level==level[0]:
+                friend.atk=level[1]
+                friend.max=level[2]
+                print(friend.atk)
 if True:
     game=Game()
     friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100,atk=50)
@@ -191,7 +198,6 @@ while game.running:
     if game.victory and game.click:
         if xp.is_moused():
             friend.xp+=enemy.worth
-            friend.hp=friend.max
             friend.hp_bar.sizex=friend.hp/2
             friend.dead=False
             for i in range(len(thresholds)):
@@ -199,15 +205,16 @@ while game.running:
                     friend.level=i+1
             friend.level_counter.level=friend.level
             game.victory=False
+            friend.update_stats()
             i=random.randint(0,2)
-            enemy=Monster(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5])
+            enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
         if net.is_moused():
             enemy.capture=True
             game.store(enemy)
             enemy.capture=False
             game.victory=False
             i=random.randint(0,2)
-            enemy=Monster(m[i][0],m[i][1],m[i][2],m[i][3],m[i][4],m[i][5])
+            enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
     if game.click:
         for monster in game.friendly_monsters:
             if monster.is_moused():
