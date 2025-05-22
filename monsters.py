@@ -50,7 +50,7 @@ class Game:
         self.turn='friend'
         self.victory=False
         self.friendly_monsters=list()
-        self.friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100,atk=50)
+        self.friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100,atk=40)
         self.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',False,worth=100,atk=10)
     def store(self, monster):
         if monster.capture:
@@ -60,7 +60,7 @@ class Game:
             self.friendly_monsters.append(monster)
         for i in range(len(game.friendly_monsters)):
             game.friendly_monsters[i].position=i
-        monster.y=monster.position*80
+        monster.y=monster.position*80+20
         monster.hp_bar.x=monster.x
         monster.hp_bar.y=monster.y+50
         monster.hp_bar.sizex=monster.hp/2
@@ -77,11 +77,10 @@ class Game:
         monster.hp_bar.y=monster.y+50
         monster.dx=monster.x+50
         monster.sx=monster.x
+        self.friend=monster
     def new_monster(self):
         i=random.randint(0,2)
         game.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
-    def update_objects(self,monster):
-        pass
 class Text(Object):
     def __init__(self,x,y,sizex,sizey,name,level):
         super().__init__(x,y,sizex,sizey,name)
@@ -149,7 +148,6 @@ class Monster(Object):
             if game.friend.level==level[0]:
                 game.friend.atk=level[1]
                 game.friend.max=level[2]
-                print(game.friend.atk)
 if True:
     game=Game()
     game.friendly_monsters.append(game.friend)
