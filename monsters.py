@@ -82,7 +82,6 @@ class Game:
         game.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
     def update_objects(self,monster):
         pass
-
 class Text(Object):
     def __init__(self,x,y,sizex,sizey,name,level):
         super().__init__(x,y,sizex,sizey,name)
@@ -222,7 +221,14 @@ while game.running:
             game.victory=False
             game.new_monster()
         if heart.is_moused():
-            pass
+            game.friend.hp+=game.friend.max/2
+            if game.friend.hp>game.friend.max:
+                game.friend.hp=game.friend.max
+            game.friend.hp_bar.sizex=game.friend.hp/2
+            if game.friend.hp>100:
+                game.friend.hp_bar.sizex=50
+            game.victory=False
+            game.new_monster()
     if game.click:
         for monster in game.friendly_monsters:
             if monster.is_moused():
