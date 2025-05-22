@@ -50,6 +50,8 @@ class Game:
         self.turn='friend'
         self.victory=False
         self.friendly_monsters=list()
+        self.friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100,atk=50)
+        self.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',False,worth=100,atk=10)
     def store(self, monster):
         if monster.capture:
             monster.hp=monster.max
@@ -67,14 +69,20 @@ class Game:
         monster.friendly=True
         monster.dead=False
     def retrieve(self, monster):
-        friend.x=WIDTH-600
-        friend.y=HEIGHT-400
-        friend.level_counter.x=friend.x+15
-        friend.level_counter.y=friend.y-15
-        friend.hp_bar.x=friend.x
-        friend.hp_bar.y=friend.y+50
-        friend.dx=friend.x+50
-        friend.sx=friend.x
+        monster.x=WIDTH-600
+        monster.y=HEIGHT-400
+        monster.level_counter.x=monster.x+15
+        monster.level_counter.y=monster.y-15
+        monster.hp_bar.x=monster.x
+        monster.hp_bar.y=monster.y+50
+        monster.dx=monster.x+50
+        monster.sx=monster.x
+    def new_monster(self):
+        i=random.randint(0,2)
+        game.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
+    def update_objects(self,monster):
+        pass
+
 class Text(Object):
     def __init__(self,x,y,sizex,sizey,name,level):
         super().__init__(x,y,sizex,sizey,name)
@@ -139,19 +147,18 @@ class Monster(Object):
                     game.turn='friend'
     def update_stats(self):
         for level in l:
-            if friend.level==level[0]:
-                friend.atk=level[1]
-                friend.max=level[2]
-                print(friend.atk)
+            if game.friend.level==level[0]:
+                game.friend.atk=level[1]
+                game.friend.max=level[2]
+                print(game.friend.atk)
 if True:
     game=Game()
-    friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100,atk=50)
-    enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',False,worth=100,atk=10)
-    game.friendly_monsters.append(friend)
+    game.friendly_monsters.append(game.friend)
     atk_button=Button(400,600,50,50,'sword.png')
     victory=Button(275,350,300,100,'victory.png')
     xp=Button(300,375,50,50,'xp.png')
     net=Button(500,375,50,50,'net.png')
+    heart=Button(WIDTH/2,HEIGHT/2+50,50,50,'heart.png')
 while game.running:
     for event in pg.event.get():
         if event.type==pg.QUIT:
@@ -160,65 +167,66 @@ while game.running:
             game.click=True
     if True:
         surface.fill((0,0,0))
-        friend.draw()
-        enemy.draw()
+        game.friend.draw()
+        game.enemy.draw()
         atk_button.draw()
-        friend.hp_bar.draw()
-        enemy.hp_bar.draw()
-        if friend.attacking or enemy.attacking:############
-            friend.move(game)
-            enemy.move(game)
+        game.friend.hp_bar.draw()
+        game.enemy.hp_bar.draw()
+        if game.friend.attacking or game.enemy.attacking:############
+            game.friend.move(game)
+            game.enemy.move(game)
         if game.victory:
             victory.draw()
             xp.draw()
             net.draw()
-        friend.level_counter.draw()
-        enemy.level_counter.draw()
+            heart.draw()
+        game.friend.level_counter.draw()
+        game.enemy.level_counter.draw()
         for monster in game.friendly_monsters:
             monster.draw()
             monster.hp_bar.draw()
             monster.level_counter.draw()
         pg.display.update()
     if atk_button.is_moused() and game.click:
-        if game.turn=='friend' and friend.dead==False:
-            friend.attacking=True
-            enemy.hp-=friend.atk
-            friend.hp-=enemy.atk
-            enemy.hp_bar.sizex=enemy.hp/2
-            friend.hp_bar.sizex=friend.hp/2
+        if game.turn=='friend' and game.friend.dead==False:
+            game.friend.attacking=True
+            game.enemy.hp-=game.friend.atk
+            game.friend.hp-=game.enemy.atk
+            game.enemy.hp_bar.sizex=game.enemy.hp/2
+            game.friend.hp_bar.sizex=game.friend.hp/2
     if game.turn=='foe':
-        enemy.attacking=True
-    if enemy.hp<=0 and not enemy.dead:
+        game.enemy.attacking=True
+    if game.enemy.hp<=0 and not game.enemy.dead:
         game.victory=True
-        enemy.dead=True
-        friend.attacking=False
-        enemy.attacking=False
-    if friend.hp<=0:
-        friend.dead=True
+        game.enemy.dead=True
+        game.friend.attacking=False
+        game.enemy.attacking=False
+    if game.friend.hp<=0:
+        game.friend.dead=True
     if game.victory and game.click:
         if xp.is_moused():
-            friend.xp+=enemy.worth
-            friend.hp_bar.sizex=friend.hp/2
-            friend.dead=False
+            game.friend.xp+=game.enemy.worth
+            game.friend.hp_bar.sizex=game.friend.hp/2
+            game.friend.dead=False
             for i in range(len(thresholds)):
-                if i!=len(thresholds)-1 and thresholds[i+1]>=friend.xp and thresholds[i]<=friend.xp:
-                    friend.level=i+1
-            friend.level_counter.level=friend.level
+                if i!=len(thresholds)-1 and thresholds[i+1]>=game.friend.xp and thresholds[i]<=game.friend.xp:
+                    game.friend.level=i+1
+            game.friend.level_counter.level=game.friend.level
             game.victory=False
-            friend.update_stats()
-            i=random.randint(0,2)
-            enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
+            game.friend.update_stats()
+            game.new_monster()
         if net.is_moused():
-            enemy.capture=True
-            game.store(enemy)
-            enemy.capture=False
+            game.enemy.capture=True
+            game.store(game.enemy)
+            game.enemy.capture=False
             game.victory=False
-            i=random.randint(0,2)
-            enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
+            game.new_monster()
+        if heart.is_moused():
+            pass
     if game.click:
         for monster in game.friendly_monsters:
             if monster.is_moused():
-                game.store(friend)
+                game.store(game.friend)
                 friend=monster
                 game.retrieve(monster)
     if game.click: game.click=False
