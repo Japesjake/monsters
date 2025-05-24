@@ -52,6 +52,8 @@ class Game:
         self.friendly_monsters=list()
         self.friend=Monster(WIDTH-600,HEIGHT-400,50,50,'wang',True,worth=100,atk=40)
         self.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,'freddy',False,worth=100,atk=10)
+        self.level=1
+        self.tier=1
     def store(self, monster):
         if monster.capture:
             monster.hp=monster.max
@@ -80,7 +82,9 @@ class Game:
         self.friend=monster
     def new_monster(self):
         i=random.randint(0,2)
-        game.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
+        self.enemy=Monster(WIDTH-200,HEIGHT-400,50,50,m[i][0],m[i][1])
+        self.tier=int((self.level+3)/5)
+        self.enemy.level=self.tier
 class Text(Object):
     def __init__(self,x,y,sizex,sizey,name,level):
         super().__init__(x,y,sizex,sizey,name)
@@ -99,7 +103,7 @@ class Button(Object):
         self.img=pg.image.load(os.path.join('buttons',name))
         self.img=pg.transform.scale(self.img,(sizex,sizey))
 class Monster(Object):
-    def __init__(self,x,y,sizex,sizey,name,friendly,hp=100,atk=10,worth=100):
+    def __init__(self,x,y,sizex,sizey,name,friendly,level=1,hp=100,atk=10,worth=100):
         super().__init__(x,y,sizex,sizey,name)
         self.hp=hp
         self.max=hp
@@ -109,6 +113,7 @@ class Monster(Object):
         self.friendly=friendly
         self.xp=0
         self.worth=worth
+        self.level=level
         if self.friendly: self.dx=self.x+50
         else: self.dx=self.x-50
         self.img=pg.image.load(os.path.join('monsters',name+'.png'))
@@ -145,9 +150,10 @@ class Monster(Object):
                     game.turn='friend'
     def update_stats(self):
         for level in l:
-            if game.friend.level==level[0]:
-                game.friend.atk=level[1]
-                game.friend.max=level[2]
+            if self.level==level[0]:
+                self.atk=level[1]
+                self.max=level[2]
+        self.level_counter.level=self.level
 if True:
     game=Game()
     game.friendly_monsters.append(game.friend)
@@ -169,7 +175,7 @@ while game.running:
         atk_button.draw()
         game.friend.hp_bar.draw()
         game.enemy.hp_bar.draw()
-        if game.friend.attacking or game.enemy.attacking:############
+        if game.friend.attacking or game.enemy.attacking:
             game.friend.move(game)
             game.enemy.move(game)
         if game.victory:
@@ -211,22 +217,28 @@ while game.running:
             game.friend.level_counter.level=game.friend.level
             game.victory=False
             game.friend.update_stats()
+            game.level+=1
             game.new_monster()
+            game.enemy.update_stats()
         if net.is_moused():
             game.enemy.capture=True
             game.store(game.enemy)
             game.enemy.capture=False
             game.victory=False
+            game.level+=1
             game.new_monster()
+            game.enemy.update_stats()
         if heart.is_moused():
-            game.friend.hp+=game.friend.max/2
+            game.friend.hp+=game.friend.max
             if game.friend.hp>game.friend.max:
                 game.friend.hp=game.friend.max
             game.friend.hp_bar.sizex=game.friend.hp/2
             if game.friend.hp>100:
                 game.friend.hp_bar.sizex=50
             game.victory=False
+            game.level+=1
             game.new_monster()
+            game.enemy.update_stats()
     if game.click:
         for monster in game.friendly_monsters:
             if monster.is_moused():

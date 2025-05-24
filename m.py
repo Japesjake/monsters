@@ -1,4 +1,4 @@
-#x,y,width,height,name,friendly
+##name,friendly
 m=[
     ['wang',False],
     ['freddy',False],
