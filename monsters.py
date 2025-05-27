@@ -206,7 +206,7 @@ while game.running:
         game.enemy.dead=True
         game.friend.attacking=False
         game.enemy.attacking=False
-    if game.friend.hp<=0:
+    if game.friend.hp<=0 and not game.victory:
         game.friend.dead=True
     if game.victory and game.click:
         if xp.is_moused():
