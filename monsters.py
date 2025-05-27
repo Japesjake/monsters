@@ -25,6 +25,7 @@ if True:
     surface=pg.display.set_mode((WIDTH,HEIGHT))
     pg.display.set_caption("Monsters")
     font=pg.font.Font('freesansbold.ttf',15)
+    font2=pg.font.Font('freesansbold.ttf',5)
 class Object:
     def __init__(self,x,y,sizex,sizey,name):
         self.x=x
@@ -72,6 +73,8 @@ class Game:
         monster.level_counter.y=monster.y-15
         monster.friendly=True
         monster.dead=False
+        monster.hp_counter.x=-50
+        monster.atk_counter.x=-50
     def retrieve(self, monster):
         monster.x=WIDTH-600
         monster.y=HEIGHT-400
@@ -81,6 +84,12 @@ class Game:
         monster.hp_bar.y=monster.y+50
         monster.dx=monster.x+50
         monster.sx=monster.x
+        monster.hp_counter.level=str('hp: '+str(monster.hp))
+        monster.atk_counter.level=str('atk: '+str(monster.atk))
+        monster.atk_counter.x=monster.x
+        monster.atk_counter.y=monster.y+70
+        monster.hp_counter.x=monster.x
+        monster.hp_counter.y=monster.y+90
         self.friend=monster
     def new_monster(self):
         i=random.randint(0,2)
@@ -126,6 +135,8 @@ class Monster(Object):
         self.position=0
         self.dead=False
         self.capture=False
+        self.atk_counter=Text(self.x,self.y+70,10,10,'atk',str('atk: '+str(self.atk)))
+        self.hp_counter=Text(self.x,self.y+90,10,10,'hp',str('hp:'+str(self.hp)))
     def move(self,game):
         if self.attacking and self.dead==False:
             if self.friendly:
@@ -191,6 +202,10 @@ while game.running:
             monster.draw()
             monster.hp_bar.draw()
             monster.level_counter.draw()
+            monster.atk_counter.draw()
+            monster.hp_counter.draw()
+        game.enemy.hp_counter.draw()
+        game.enemy.atk_counter.draw()
         pg.display.update()
     if atk_button.is_moused() and game.click:
         if game.turn=='friend' and game.friend.dead==False:
@@ -199,6 +214,8 @@ while game.running:
             game.friend.hp-=game.enemy.atk
             game.enemy.hp_bar.sizex=game.enemy.hp/2
             game.friend.hp_bar.sizex=game.friend.hp/2
+            game.friend.hp_counter.level=str('hp: '+str(game.friend.hp))
+            game.enemy.hp_counter.level=str('hp: '+str(game.enemy.hp))
     if game.turn=='foe':
         game.enemy.attacking=True
     if game.enemy.hp<=0 and not game.enemy.dead:
