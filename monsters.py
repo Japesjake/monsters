@@ -73,8 +73,8 @@ class Game:
         monster.level_counter.y=monster.y-15
         monster.friendly=True
         monster.dead=False
-        monster.hp_counter.x=-50
-        monster.atk_counter.x=-50
+        monster.hp_counter.x=-100
+        monster.atk_counter.x=-100
     def retrieve(self, monster):
         monster.x=WIDTH-600
         monster.y=HEIGHT-400
@@ -237,8 +237,12 @@ while game.running:
             game.victory=False
             game.friend.update_stats()
             game.level+=1
+            game.friend.atk_counter.level=str('atk: '+str(game.friend.atk))
+            game.friend.hp_counter.level=str('hp: '+str(game.friend.hp))
             game.new_monster()
             game.enemy.update_stats()
+            game.enemy.atk_counter.level=str('atk: '+str(game.enemy.atk))            
+            game.enemy.hp_counter.level=str('hp: '+str(game.enemy.hp))            
         if net.is_moused():
             game.enemy.capture=True
             game.store(game.enemy)
@@ -247,6 +251,8 @@ while game.running:
             game.level+=1
             game.new_monster()
             game.enemy.update_stats()
+            game.enemy.atk_counter.level=str('atk: '+str(game.enemy.atk))
+            game.enemy.hp_counter.level=str('hp: '+str(game.enemy.hp))
         if heart.is_moused():
             game.friend.hp+=game.friend.max
             if game.friend.hp>game.friend.max:
@@ -256,8 +262,12 @@ while game.running:
                 game.friend.hp_bar.sizex=50
             game.victory=False
             game.level+=1
+            game.friend.hp_counter.level=str('hp: '+str(game.friend.hp))
             game.new_monster()
             game.enemy.update_stats()
+            game.enemy.atk_counter.level=str('atk: '+str(game.enemy.atk))
+            game.enemy.hp_counter.level=str('hp: '+str(game.enemy.hp))
+
     if game.click:
         for monster in game.friendly_monsters:
             if monster.is_moused():

@@ -1,2 +1,2 @@
-from thresholds import thresholds
-print(thresholds)
+[3,3,3,3]
+[3,3,3]
