@@ -65,7 +65,9 @@ class Game:
         monster.y=monster.position*80+20
         monster.hp_bar.x=monster.x
         monster.hp_bar.y=monster.y+50
-        monster.hp_bar.sizex=monster.hp/2
+        if monster.hp>100:
+            monster.hp_bar.sizex=50
+        else: monster.hp_bar.sizex=monster.hp/2
         monster.level_counter.x=0
         monster.level_counter.y=monster.y-15
         monster.friendly=True
