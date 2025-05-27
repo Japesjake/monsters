@@ -247,4 +247,9 @@ while game.running:
                 game.store(game.friend)
                 friend=monster
                 game.retrieve(monster)
+    for i in range(len(game.friendly_monsters)):
+        if len(game.friendly_monsters)==i:
+            break
+        if game.friendly_monsters[i].hp<=0:
+            del game.friendly_monsters[i]
     if game.click: game.click=False
