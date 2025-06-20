@@ -16,7 +16,7 @@ if True:
     pg.init()
     pg.mixer.init()
     music=pg.mixer.music.load("battle2.wav")
-    # pg.mixer.music.play(-1)
+    pg.mixer.music.play(-1)
     WIDTH=800
     HEIGHT=800
     GREEN=(0,128,0)
@@ -166,6 +166,7 @@ class Monster(Object):
             if self.level==level[0]:
                 self.atk=level[1]
                 self.max=level[2]
+                self.worth=level[3]
         self.level_counter.level=self.level
 if True:
     game=Game()
